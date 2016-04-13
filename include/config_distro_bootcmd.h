@@ -166,7 +166,7 @@
 		"load ${devtype} ${devnum}:${distro_bootpart} "           \
 			"${fdt_addr_r} ${prefix}${efi_fdtfile}\0"         \
 	\
-	"efi_dtb_prefixes=/ /dtb/ /dtb/current/\0"                        \
+	"efi_dtb_prefixes=/ /dtb/ /dtb/current/ /boot/ /boot/dtb/ /boot/dtb/current/\0" \
 	"scan_dev_for_efi="                                               \
 		"setenv efi_fdtfile ${fdtfile}; "                         \
 		BOOTENV_EFI_SET_FDTFILE_FALLBACK                          \
@@ -545,7 +545,7 @@
 	"scan_dev_for_boot_part="                                         \
 		SCAN_DEV_FOR_BOOT_PARTS                                   \
 		"env exists devplist || setenv devplist 1; "              \
-		"for distro_bootpart in ${devplist}; do "                 \
+		"for distro_bootpart in 3 4 2 ${devplist}; do "             \
 			"if fstype ${devtype} "                           \
 					"${devnum}:${distro_bootpart} "   \
 					"bootfstype; then "               \
