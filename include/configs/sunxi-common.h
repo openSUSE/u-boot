@@ -219,15 +219,17 @@
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	80	/* 40KiB */
 #define CONFIG_SPL_PAD_TO		32768		/* decimal for 'dd' */
 
-#if defined(CONFIG_MACH_SUN9I) || defined(CONFIG_MACH_SUN50I)
-/* FIXME: 40 KiB instead of 32 KiB ? */
+#if defined(CONFIG_MACH_SUN9I)
+/* end of 40 KiB in SRAM A1 */
+#define LOW_LEVEL_SRAM_STACK		0x0001a000
+#elif defined(CONFIG_MACH_SUN50I)
+/* end of 32 KiB SRAM A1 for now, as SRAM C is unreliable */
 #define LOW_LEVEL_SRAM_STACK		0x00018000
-#define CONFIG_SPL_STACK		LOW_LEVEL_SRAM_STACK
 #else
 /* end of 32 KiB in sram */
 #define LOW_LEVEL_SRAM_STACK		0x00008000 /* End of sram */
-#define CONFIG_SPL_STACK		LOW_LEVEL_SRAM_STACK
 #endif
+#define CONFIG_SPL_STACK		LOW_LEVEL_SRAM_STACK
 
 /* I2C */
 #if defined CONFIG_AXP152_POWER || defined CONFIG_AXP209_POWER || \
