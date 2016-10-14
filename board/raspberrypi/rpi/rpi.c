@@ -18,7 +18,6 @@
 #include <asm/arch/mbox.h>
 #include <asm/arch/sdhci.h>
 #include <asm/global_data.h>
-#include <dm/platform_data/serial_pl01x.h>
 #include <dm/platform_data/serial_bcm283x_mu.h>
 #ifdef CONFIG_ARM64
 #include <asm/armv8/mmu.h>
@@ -26,42 +25,6 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-static const struct bcm2835_gpio_platdata gpio_platdata = {
-	.base = BCM2835_GPIO_BASE,
-};
-
-U_BOOT_DEVICE(bcm2835_gpios) = {
-	.name = "gpio_bcm2835",
-	.platdata = &gpio_platdata,
-};
-
-#ifdef CONFIG_PL01X_SERIAL
-static const struct pl01x_serial_platdata serial_platdata = {
-#ifndef CONFIG_BCM2835
-	.base = 0x3f201000,
-#else
-	.base = 0x20201000,
-#endif
-	.type = TYPE_PL011,
-	.skip_init = true,
-};
-
-U_BOOT_DEVICE(bcm2835_serials) = {
-	.name = "serial_pl01x",
-	.platdata = &serial_platdata,
-};
-#else
-static struct bcm283x_mu_serial_platdata serial_platdata = {
-	.base = 0x3f215040,
-	.clock = 250000000,
-	.skip_init = true,
-};
-
-U_BOOT_DEVICE(bcm2837_serials) = {
-	.name = "serial_bcm283x_mu",
-	.platdata = &serial_platdata,
-};
-#endif
 
 struct msg_get_arm_mem {
 	struct bcm2835_mbox_hdr hdr;
@@ -444,15 +407,6 @@ static void get_board_rev(void)
 	printf("RPI %s (0x%x)\n", model->name, revision);
 }
 
-int board_init(void)
-{
-	get_board_rev();
-
-	gd->bd->bi_boot_params = 0x100;
-
-	return power_on_module(BCM2835_MBOX_POWER_DEVID_USB_HCD);
-}
-
 #ifndef CONFIG_PL01X_SERIAL
 static bool rpi_is_serial_active(void)
 {
@@ -472,17 +426,38 @@ static bool rpi_is_serial_active(void)
 
 	return true;
 }
+
+/* Disable mini-UART I/O if it's not pinmuxed to our pins.
+ * The firmware only enables it if explicitly done in config.txt: enable_uart=1
+ */
+static void rpi_disable_inactive_uart(void)
+{
+	struct udevice *dev;
+	struct bcm283x_mu_serial_platdata *plat;
+
+	if (uclass_get_device_by_driver(UCLASS_SERIAL,
+					DM_GET_DRIVER(serial_bcm283x_mu),
+					&dev) || !dev)
+		return;
+
+	if (!rpi_is_serial_active()) {
+		plat = dev_get_platdata(dev);
+		plat->disabled = true;
+	}
+}
 #endif
 
-int board_early_init_f(void)
+int board_init(void)
 {
 #ifndef CONFIG_PL01X_SERIAL
-	/* Disable mini-UART I/O if it's not pinmuxed to our pins */
-	if (!rpi_is_serial_active())
-		serial_platdata.disabled = true;
+	rpi_disable_inactive_uart();
 #endif
 
-	return 0;
+	get_board_rev();
+
+	gd->bd->bi_boot_params = 0x100;
+
+	return power_on_module(BCM2835_MBOX_POWER_DEVID_USB_HCD);
 }
 
 int board_mmc_init(bd_t *bis)
