@@ -19,6 +19,7 @@
 #define BOOT_BROM_DOWNLOAD	0xEF08A53C
 
 #ifndef __ASSEMBLY__
+void set_back_to_bootrom_dnl_flag(void);
 int setup_boot_mode(void);
 #endif
 
