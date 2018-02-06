@@ -44,16 +44,36 @@ static int do_go(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 	printf ("## Application terminated, rc = 0x%lX\n", rc);
 	return rcode;
 }
+#endif
+
+#if defined(CONFIG_ROCKCHIP_BOOT_MODE_REG) && CONFIG_ROCKCHIP_BOOT_MODE_REG
+#include <asm/arch-rockchip/boot_mode.h>
+static int do_reboot_brom(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
+{
+	set_back_to_bootrom_dnl_flag();
+	do_reset(NULL, 0, 0, NULL);
+
+	return 0;
+}
+#endif
 
 /* -------------------------------------------------------------------- */
 
+#ifdef CONFIG_CMD_GO
 U_BOOT_CMD(
 	go, CONFIG_SYS_MAXARGS, 1,	do_go,
 	"start application at address 'addr'",
 	"addr [arg ...]\n    - start application at address 'addr'\n"
 	"      passing 'arg' as arguments"
 );
+#endif
 
+#if defined(CONFIG_ROCKCHIP_BOOT_MODE_REG) && CONFIG_ROCKCHIP_BOOT_MODE_REG
+U_BOOT_CMD(
+	rbrom, 1, 0,	do_reboot_brom,
+	"Perform RESET of the CPU and enter boot rom",
+	""
+);
 #endif
 
 U_BOOT_CMD(
