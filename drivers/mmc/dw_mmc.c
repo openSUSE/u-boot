@@ -609,7 +609,8 @@ void dwmci_setup_cfg(struct mmc_config *cfg, struct dwmci_host *host,
 		cfg->host_caps |= MMC_MODE_4BIT;
 		cfg->host_caps &= ~MMC_MODE_8BIT;
 	}
-	cfg->host_caps |= MMC_MODE_HS | MMC_MODE_HS_52MHz;
+	/* Temp workaround for Chromebook snow to avoid the 'unable to select a mode' error */
+// 	cfg->host_caps |= MMC_MODE_HS | MMC_MODE_HS_52MHz;
 
 	cfg->b_max = CONFIG_SYS_MMC_MAX_BLK_COUNT;
 }
