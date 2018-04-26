@@ -42,6 +42,7 @@ enum bif_flag {
 	BIF_FLAG_PUF_FILE,
 	BIF_FLAG_AARCH32,
 	BIF_FLAG_PART_OWNER_UBOOT,
+	BIF_FLAG_LOAD_AFTER,
 
 	/* Internal flags */
 	BIF_FLAG_BIT_FILE,
@@ -150,6 +151,11 @@ static char *parse_el(char *line, struct bif_entry *bf)
 static char *parse_load(char *line, struct bif_entry *bf)
 {
 	char *endptr;
+
+	if (!strncmp(line, "after", strlen("after"))) {
+		bf->flags |= (1ULL << BIF_FLAG_LOAD_AFTER);
+		return line + strlen("after");
+	}
 
 	bf->load = strtoll(line, &endptr, 0);
 
@@ -344,6 +350,15 @@ static int bif_add_part(struct bif_entry *bf, const char *data, size_t len)
 	r = bif_add_blob(data, len, &bf->offset);
 	if (r)
 		return r;
+
+	if (bf->flags & (1ULL << BIF_FLAG_LOAD_AFTER) &&
+	    bif_output.last_part) {
+		struct partition_header *p = bif_output.last_part;
+		uint64_t load = le64_to_cpu(p->load_address);
+
+		load += le32_to_cpu(p->len) * 4;
+		parthdr.load_address = cpu_to_le64(load);
+	}
 
 	parthdr.offset = cpu_to_le32(bf->offset / 4);
 
