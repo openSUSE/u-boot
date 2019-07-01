@@ -1057,7 +1057,7 @@ int usb_lowlevel_stop(int index)
  * transfers are not supported.
  */
 int submit_int_msg(struct usb_device *dev, unsigned long pipe,
-				void *buffer, int len, int interval)
+		   void *buffer, int len, int interval, bool nonblock)
 {
 	int dir_out = usb_pipeout(pipe);
 	int ep = usb_pipeendpoint(pipe);
