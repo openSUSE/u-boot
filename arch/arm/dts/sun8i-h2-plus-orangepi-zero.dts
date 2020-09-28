@@ -164,8 +164,8 @@
 };
 
 &spi0 {
-	/* Disable SPI NOR by default: it optional on Orange Pi Zero boards */
-	status = "disabled";
+	/* Enable SPI NOR by default: it optional on Orange Pi Zero boards */
+	status = "okay";
 
 	flash@0 {
 		#address-cells = <1>;
