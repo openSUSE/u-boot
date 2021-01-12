@@ -113,6 +113,16 @@ config SPL_DM_SEQ_ALIAS
 	  numbered devices (e.g. serial0 = &serial0). This feature can be
 	  disabled if it is not required, to save code space in SPL.
 
+config DM_DMA
+	bool "Support per-device DMA constraints"
+	depends on DM
+	default n
+	help
+	  Enable this to extract per-device DMA constraints, only supported on
+	  device-tree systems for now. This is needed in order translate
+	  addresses on systems where different buses have different views of
+	  the physical address space.
+
 config REGMAP
 	bool "Support register maps"
 	depends on DM
