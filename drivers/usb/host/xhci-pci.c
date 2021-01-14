@@ -61,7 +61,7 @@ U_BOOT_DRIVER(xhci_pci) = {
 	.ops	= &xhci_usb_ops,
 	.platdata_auto_alloc_size = sizeof(struct usb_platdata),
 	.priv_auto_alloc_size = sizeof(struct xhci_ctrl),
-	.flags	= DM_FLAG_ALLOC_PRIV_DMA,
+	.flags	= DM_FLAG_OS_PREPARE | DM_FLAG_ALLOC_PRIV_DMA,
 };
 
 static struct pci_device_id xhci_pci_supported[] = {
