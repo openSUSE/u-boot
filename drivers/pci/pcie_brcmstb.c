@@ -577,6 +577,24 @@ static int brcm_pcie_probe(struct udevice *dev)
 	return 0;
 }
 
+static int brcm_pcie_remove(struct udevice *dev)
+{
+	struct brcm_pcie *pcie = dev_get_priv(dev);
+	void __iomem *base = pcie->base;
+
+	/* Assert fundamental reset */
+	setbits_le32(base + PCIE_RGR1_SW_INIT_1, RGR1_SW_INIT_1_PERST_MASK);
+
+	/* Turn off SerDes */
+	setbits_le32(base + PCIE_MISC_HARD_PCIE_HARD_DEBUG,
+		     PCIE_HARD_DEBUG_SERDES_IDDQ_MASK);
+
+	/* Shutdown bridge */
+	setbits_le32(base + PCIE_RGR1_SW_INIT_1, RGR1_SW_INIT_1_INIT_MASK);
+
+	return 0;
+}
+
 static int brcm_pcie_ofdata_to_platdata(struct udevice *dev)
 {
 	struct brcm_pcie *pcie = dev_get_priv(dev);
@@ -616,6 +634,8 @@ U_BOOT_DRIVER(pcie_brcm_base) = {
 	.ops			= &brcm_pcie_ops,
 	.of_match		= brcm_pcie_ids,
 	.probe			= brcm_pcie_probe,
+	.remove			= brcm_pcie_remove,
 	.ofdata_to_platdata	= brcm_pcie_ofdata_to_platdata,
 	.priv_auto_alloc_size	= sizeof(struct brcm_pcie),
+	.flags		= DM_FLAG_OS_PREPARE,
 };
