@@ -105,6 +105,10 @@ static int smbios_string_table_len(char *start)
 		len += i;
 	}
 
+	/* A table without a string has to end with \0\0 */
+	if (len == 0)
+		return 2;
+
 	return len + 1;
 }
 
