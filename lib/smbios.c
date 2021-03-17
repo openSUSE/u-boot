@@ -172,7 +172,7 @@ static int smbios_add_prop(struct smbios_ctx *ctx, const char *prop)
 static void smbios_set_eos(struct smbios_ctx *ctx, char *eos)
 {
 	ctx->eos = eos;
-	ctx->next_ptr = eos;
+	ctx->next_ptr = eos + 1;
 	ctx->last_str = NULL;
 }
 
