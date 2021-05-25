@@ -18,6 +18,7 @@
 #include <log.h>
 #include <part.h>
 #include <malloc.h>
+#include <watchdog.h>
 
 struct efi_system_partition efi_system_partition = {
 	.uclass_id = UCLASS_INVALID,
@@ -136,8 +137,7 @@ static efi_status_t efi_disk_rw_blocks(struct efi_block_io *this,
 			n = blk_dwrite(desc, lba, blocks, buffer);
 	}
 
-	/* We don't do interrupts, so check for timers cooperatively */
-	efi_timer_check();
+	schedule();
 
 	EFI_PRINT("n=%lx blocks=%x\n", n, blocks);
 
