@@ -178,7 +178,7 @@ config DISTRO_DEFAULTS
 	select HUSH_PARSER
 	select SUPPORT_RAW_INITRD
 	select SYS_LONGHELP
-	imply CMD_BTRFS if !RISCV && !MIPS
+	imply CMD_BTRFS if !MIPS
 	imply CMD_MII if NET
 	imply USB_STORAGE
 	imply USE_BOOTCOMMAND
