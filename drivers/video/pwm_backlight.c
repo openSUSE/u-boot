@@ -64,7 +64,7 @@ static int set_pwm(struct pwm_backlight_priv *priv)
 
 	if (priv->period_ns) {
 		duty_cycle = priv->period_ns * (priv->cur_level - priv->min_level) /
-			(priv->max_level - priv->min_level);
+			(priv->max_level - priv->min_level + 1);
 		ret = pwm_set_config(priv->pwm, priv->channel, priv->period_ns,
 				     duty_cycle);
 	} else {
