@@ -1073,6 +1073,22 @@ source "board/sunxi/Kconfig"
 
 endif
 
+config SUNXI_RTC_FEL_ENTRY_GPR
+	int "Use a RTC GPR to enter FEL"
+	depends on MACH_SUN8I_H3
+	range -1 7
+	default 1
+	help
+	  Add rbrom command to set a RTC general purpose register before reboot.
+	  Check the GPR value in SPL and jump to FEL if set.
+	  Value -1 disables the feature.
+
+config SUNXI_RTC_FEL_ENTRY_VALUE
+	hex "Value to set in the RTC GPR"
+	depends on SUNXI_RTC_FEL_ENTRY_GPR >= 0
+	range 0x1 0xffffffff
+	default 0xb0010fe1
+
 config CHIP_DIP_SCAN
 	bool "Enable DIPs detection for CHIP board"
 	select SUPPORT_EXTENSION_SCAN
