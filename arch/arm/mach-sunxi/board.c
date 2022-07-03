@@ -315,7 +315,30 @@ uint32_t sunxi_get_boot_device(void)
 	return -1;		/* Never reached */
 }
 
+void set_rtc_fel_flag(void)
+{
+#ifdef SUNXI_FEL_REG
+	volatile long *check_reg = (void *)SUNXI_FEL_REG;
+
+	*check_reg = CONFIG_SUNXI_RTC_FEL_ENTRY_VALUE;
+#endif
+}
+
 #ifdef CONFIG_SPL_BUILD
+
+void check_rtc_fel_flag(void)
+{
+#ifdef SUNXI_FEL_REG
+	volatile long *check_reg = (void *)SUNXI_FEL_REG;
+	void (*entry)(void) = (void*)SUNXI_FEL_ENTRY_ADDRESS;
+
+	if (*check_reg == CONFIG_SUNXI_RTC_FEL_ENTRY_VALUE) {
+		*check_reg = 0;
+		return entry();
+	}
+#endif
+}
+
 uint32_t sunxi_get_spl_size(void)
 {
 	struct boot_file_head *egon_head = (void *)SPL_ADDR;
@@ -457,6 +480,7 @@ u32 spl_mmc_boot_mode(struct mmc *mmc, const u32 boot_device)
 
 void board_init_f(ulong dummy)
 {
+	check_rtc_fel_flag();
 	sunxi_sram_init();
 
 #if defined CONFIG_MACH_SUN6I || defined CONFIG_MACH_SUN8I_H3
