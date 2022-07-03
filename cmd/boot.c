@@ -47,6 +47,7 @@ static int do_go(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 #endif
 
 #if defined(CONFIG_ROCKCHIP_BOOT_MODE_REG) && CONFIG_ROCKCHIP_BOOT_MODE_REG
+#define RBROM
 #include <asm/arch-rockchip/boot_mode.h>
 static int do_reboot_brom(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
 {
@@ -55,6 +56,20 @@ static int do_reboot_brom(struct cmd_tbl *cmdtp, int flag, int argc, char * cons
 
 	return 0;
 }
+#endif
+
+#ifdef CONFIG_ARCH_SUNXI
+#include <asm/arch-sunxi/cpu.h>
+#ifdef SUNXI_FEL_REG
+#define RBROM
+static int do_reboot_brom(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
+{
+	set_rtc_fel_flag();
+	do_reset(NULL, 0, 0, NULL);
+
+	return 0;
+}
+#endif
 #endif
 
 /* -------------------------------------------------------------------- */
@@ -68,7 +83,7 @@ U_BOOT_CMD(
 );
 #endif
 
-#if defined(CONFIG_ROCKCHIP_BOOT_MODE_REG) && CONFIG_ROCKCHIP_BOOT_MODE_REG
+#ifdef RBROM
 U_BOOT_CMD(
 	rbrom, 1, 0,	do_reboot_brom,
 	"Perform RESET of the CPU and enter boot rom",
