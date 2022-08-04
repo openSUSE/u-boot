@@ -574,16 +574,35 @@ int uclass_get_device_by_phandle(enum uclass_id id, struct udevice *parent,
 }
 #endif
 
+/*
+ * Starting from the given device return first device in the uclass that
+ * probes successfully.
+ */
+static int _uclass_next_device(struct udevice *dev, int ret,
+			       struct udevice **devp)
+{
+	if (!dev) {
+		*devp = dev;
+		return ret;
+	}
+	while ((ret = uclass_get_device_tail(dev, ret, devp))) {
+		ret = uclass_find_next_device(&dev);
+		if (!dev) {
+			*devp = dev;
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
 int uclass_first_device(enum uclass_id id, struct udevice **devp)
 {
 	struct udevice *dev;
 	int ret;
 
-	*devp = NULL;
 	ret = uclass_find_first_device(id, &dev);
-	if (!dev)
-		return 0;
-	return uclass_get_device_tail(dev, ret, devp);
+	return _uclass_next_device(dev, ret, devp);
 }
 
 int uclass_first_device_err(enum uclass_id id, struct udevice **devp)
@@ -604,11 +623,8 @@ int uclass_next_device(struct udevice **devp)
 	struct udevice *dev = *devp;
 	int ret;
 
-	*devp = NULL;
 	ret = uclass_find_next_device(&dev);
-	if (!dev)
-		return 0;
-	return uclass_get_device_tail(dev, ret, devp);
+	return _uclass_next_device(dev, ret, devp);
 }
 
 int uclass_next_device_err(struct udevice **devp)
