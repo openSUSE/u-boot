@@ -129,37 +129,34 @@ static int rk8xx_read(struct udevice *dev, uint reg, uint8_t *buff, int len)
 	return 0;
 }
 
-#if CONFIG_IS_ENABLED(PMIC_CHILDREN)
 static int rk8xx_bind(struct udevice *dev)
 {
-	ofnode regulators_node;
-	int children, ret;
-
-	regulators_node = dev_read_subnode(dev, "regulators");
-	if (!ofnode_valid(regulators_node)) {
-		debug("%s: %s regulators subnode not found!\n", __func__,
-		      dev->name);
-		return -ENXIO;
-	}
-
-	debug("%s: '%s' - found regulators subnode\n", __func__, dev->name);
-
 	if (CONFIG_IS_ENABLED(SYSRESET)) {
-		ret = device_bind_driver_to_node(dev, "rk8xx_sysreset",
-						 "rk8xx_sysreset",
-						 dev_ofnode(dev), NULL);
-		if (ret)
-			return ret;
+		device_bind_driver(dev, "rk8xx_sysreset",
+				   "rk8xx_sysreset", NULL);
 	}
 
-	children = pmic_bind_children(dev, regulators_node, pmic_children_info);
-	if (!children)
-		debug("%s: %s - no child found\n", __func__, dev->name);
+	if (CONFIG_IS_ENABLED(PMIC_CHILDREN)) {
+		ofnode regulators_node;
+		int children;
+
+		regulators_node = dev_read_subnode(dev, "regulators");
+		if (!ofnode_valid(regulators_node)) {
+			debug("%s: %s regulators subnode not found!\n", __func__,
+			      dev->name);
+			return -ENXIO;
+		}
+
+		debug("%s: '%s' - found regulators subnode\n", __func__, dev->name);
+
+		children = pmic_bind_children(dev, regulators_node, pmic_children_info);
+		if (!children)
+			debug("%s: %s - no child found\n", __func__, dev->name);
+	}
 
 	/* Always return success for this device */
 	return 0;
 }
-#endif
 
 static int rk8xx_probe(struct udevice *dev)
 {
@@ -269,9 +266,7 @@ U_BOOT_DRIVER(rockchip_rk805) = {
 	.name = "rockchip_rk805",
 	.id = UCLASS_PMIC,
 	.of_match = rk8xx_ids,
-#if CONFIG_IS_ENABLED(PMIC_CHILDREN)
 	.bind = rk8xx_bind,
-#endif
 	.priv_auto	  = sizeof(struct rk8xx_priv),
 	.probe = rk8xx_probe,
 	.ops = &rk8xx_ops,
