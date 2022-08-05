@@ -131,7 +131,7 @@ static int rk8xx_read(struct udevice *dev, uint reg, uint8_t *buff, int len)
 
 static int rk8xx_bind(struct udevice *dev)
 {
-	if (CONFIG_IS_ENABLED(SYSRESET)) {
+	if (CONFIG_IS_ENABLED(SYSRESET) && (gd->flags & GD_FLG_RELOC)) {
 		device_bind_driver(dev, "rk8xx_sysreset",
 				   "rk8xx_sysreset", NULL);
 	}
