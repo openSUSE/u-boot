@@ -423,7 +423,7 @@ void clk_free(struct clk *clk);
  * @clk:	A clock struct that was previously successfully requested by
  *		clk_request/get_by_*().
  *
- * Return: clock rate in Hz on success, 0 for invalid clock, or -ve error code
+ * Return: clock rate in Hz on success, 0 on error
  *	   for other errors.
  */
 ulong clk_get_rate(struct clk *clk);
@@ -442,7 +442,7 @@ struct clk *clk_get_parent(struct clk *clk);
  * @clk:	A clock struct that was previously successfully requested by
  *		clk_request/get_by_*().
  *
- * Return: clock rate in Hz, or -ve error code.
+ * Return: clock rate in Hz, 0 on error.
  */
 ulong clk_get_parent_rate(struct clk *clk);
 
@@ -465,7 +465,7 @@ ulong clk_get_parent_rate(struct clk *clk);
  * are equivalent except the former does not modify the clock hardware
  * in any way.
  *
- * Return: rounded rate in Hz, or -ve error code.
+ * Return: rounded rate in Hz, 0 on error.
  */
 ulong clk_round_rate(struct clk *clk, ulong rate);
 
@@ -475,7 +475,7 @@ ulong clk_round_rate(struct clk *clk, ulong rate);
  *		clk_request/get_by_*().
  * @rate:	New clock rate in Hz.
  *
- * Return: new rate, or -ve error code.
+ * Return: new rate, or 0 on error.
  */
 ulong clk_set_rate(struct clk *clk, ulong rate);
 
@@ -569,7 +569,7 @@ static inline void clk_free(struct clk *clk)
 
 static inline ulong clk_get_rate(struct clk *clk)
 {
-	return -ENOSYS;
+	return 0;
 }
 
 static inline struct clk *clk_get_parent(struct clk *clk)
@@ -579,17 +579,17 @@ static inline struct clk *clk_get_parent(struct clk *clk)
 
 static inline ulong clk_get_parent_rate(struct clk *clk)
 {
-	return -ENOSYS;
+	return 0;
 }
 
 static inline ulong clk_round_rate(struct clk *clk, ulong rate)
 {
-	return -ENOSYS;
+	return 0;
 }
 
 static inline ulong clk_set_rate(struct clk *clk, ulong rate)
 {
-	return -ENOSYS;
+	return 0;
 }
 
 static inline int clk_set_parent(struct clk *clk, struct clk *parent)

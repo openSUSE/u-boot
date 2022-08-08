@@ -469,21 +469,20 @@ void clk_free(struct clk *clk)
 ulong clk_get_rate(struct clk *clk)
 {
 	const struct clk_ops *ops;
-	int ret;
+	ulong rate;
 
 	debug("%s(clk=%p)\n", __func__, clk);
 	if (!clk_valid(clk))
 		return 0;
+
 	ops = clk_dev_ops(clk->dev);
-
 	if (!ops->get_rate)
-		return -ENOSYS;
+		return 0;
 
-	ret = ops->get_rate(clk);
-	if (ret)
-		return log_ret(ret);
+	rate = ops->get_rate(clk);
+	debug("%s(clk=%p, rate=%lu)\n", __func__, clk, rate);
 
-	return 0;
+	return rate;
 }
 
 struct clk *clk_get_parent(struct clk *clk)
@@ -516,11 +515,11 @@ ulong clk_get_parent_rate(struct clk *clk)
 
 	pclk = clk_get_parent(clk);
 	if (IS_ERR(pclk))
-		return -ENODEV;
+		return 0;
 
 	ops = clk_dev_ops(pclk->dev);
 	if (!ops->get_rate)
-		return -ENOSYS;
+		return 0;
 
 	/* Read the 'rate' if not already set or if proper flag set*/
 	if (!pclk->rate || pclk->flags & CLK_GET_RATE_NOCACHE)
@@ -539,7 +538,7 @@ ulong clk_round_rate(struct clk *clk, ulong rate)
 
 	ops = clk_dev_ops(clk->dev);
 	if (!ops->round_rate)
-		return -ENOSYS;
+		return 0;
 
 	return ops->round_rate(clk, rate);
 }
@@ -570,7 +569,7 @@ ulong clk_set_rate(struct clk *clk, ulong rate)
 	ops = clk_dev_ops(clk->dev);
 
 	if (!ops->set_rate)
-		return -ENOSYS;
+		return 0;
 
 	/* Clean up cached rates for us and all child clocks */
 	clk_clean_rate_cache(clk);

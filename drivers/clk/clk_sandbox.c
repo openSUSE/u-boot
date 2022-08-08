@@ -16,10 +16,10 @@ static ulong sandbox_clk_get_rate(struct clk *clk)
 	struct sandbox_clk_priv *priv = dev_get_priv(clk->dev);
 
 	if (!priv->probed)
-		return -ENODEV;
+		return 0;
 
 	if (clk->id >= SANDBOX_CLK_ID_COUNT)
-		return -EINVAL;
+		return 0;
 
 	return priv->rate[clk->id];
 }
@@ -29,10 +29,10 @@ static ulong sandbox_clk_round_rate(struct clk *clk, ulong rate)
 	struct sandbox_clk_priv *priv = dev_get_priv(clk->dev);
 
 	if (!priv->probed)
-		return -ENODEV;
+		return 0;
 
 	if (clk->id >= SANDBOX_CLK_ID_COUNT)
-		return -EINVAL;
+		return 0;
 
 	if (!rate)
 		return -EINVAL;
@@ -46,13 +46,13 @@ static ulong sandbox_clk_set_rate(struct clk *clk, ulong rate)
 	ulong old_rate;
 
 	if (!priv->probed)
-		return -ENODEV;
+		return 0;
 
 	if (clk->id >= SANDBOX_CLK_ID_COUNT)
-		return -EINVAL;
+		return 0;
 
 	if (!rate)
-		return -EINVAL;
+		return 0;
 
 	old_rate = priv->rate[clk->id];
 	priv->rate[clk->id] = rate;
@@ -149,7 +149,7 @@ ulong sandbox_clk_query_rate(struct udevice *dev, int id)
 	struct sandbox_clk_priv *priv = dev_get_priv(dev);
 
 	if (id < 0 || id >= SANDBOX_CLK_ID_COUNT)
-		return -EINVAL;
+		return 0;
 
 	return priv->rate[id];
 }

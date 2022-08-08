@@ -39,7 +39,6 @@ DM_TEST(dm_test_clk_base, UT_TESTF_SCAN_FDT);
 static int dm_test_clk(struct unit_test_state *uts)
 {
 	struct udevice *dev_fixed, *dev_fixed_factor, *dev_clk, *dev_test;
-	ulong rate;
 
 	ut_assertok(uclass_get_device_by_name(UCLASS_CLK, "clk-fixed",
 					      &dev_fixed));
@@ -82,11 +81,11 @@ static int dm_test_clk(struct unit_test_state *uts)
 	ut_asserteq(0, sandbox_clk_test_get_rate(dev_test,
 						 SANDBOX_CLK_TEST_ID_DEVM2));
 
-	rate = sandbox_clk_test_set_rate(dev_test, SANDBOX_CLK_TEST_ID_FIXED,
-					 12345);
-	ut_assert(IS_ERR_VALUE(rate));
-	rate = sandbox_clk_test_get_rate(dev_test, SANDBOX_CLK_TEST_ID_FIXED);
-	ut_asserteq(1234, rate);
+	ut_asserteq(0, sandbox_clk_test_set_rate(dev_test,
+						 SANDBOX_CLK_TEST_ID_FIXED,
+						 12345));
+	ut_asserteq(1234, sandbox_clk_test_get_rate(dev_test,
+						    SANDBOX_CLK_TEST_ID_FIXED));
 
 	ut_asserteq(0, sandbox_clk_test_set_rate(dev_test,
 						 SANDBOX_CLK_TEST_ID_SPI,
@@ -107,10 +106,10 @@ static int dm_test_clk(struct unit_test_state *uts)
 						    SANDBOX_CLK_TEST_ID_I2C,
 						    20000));
 
-	rate = sandbox_clk_test_set_rate(dev_test, SANDBOX_CLK_TEST_ID_SPI, 0);
-	ut_assert(IS_ERR_VALUE(rate));
-	rate = sandbox_clk_test_set_rate(dev_test, SANDBOX_CLK_TEST_ID_I2C, 0);
-	ut_assert(IS_ERR_VALUE(rate));
+	ut_asserteq(0, sandbox_clk_test_set_rate(dev_test,
+						 SANDBOX_CLK_TEST_ID_SPI, 0));
+	ut_asserteq(0, sandbox_clk_test_set_rate(dev_test,
+						 SANDBOX_CLK_TEST_ID_I2C, 0));
 
 	ut_asserteq(10000, sandbox_clk_test_get_rate(dev_test,
 						     SANDBOX_CLK_TEST_ID_SPI));
@@ -129,10 +128,10 @@ static int dm_test_clk(struct unit_test_state *uts)
 	ut_asserteq(20000, sandbox_clk_test_get_rate(dev_test,
 						     SANDBOX_CLK_TEST_ID_I2C));
 
-	rate = sandbox_clk_test_round_rate(dev_test, SANDBOX_CLK_TEST_ID_SPI, 0);
-	ut_assert(IS_ERR_VALUE(rate));
-	rate = sandbox_clk_test_round_rate(dev_test, SANDBOX_CLK_TEST_ID_I2C, 0);
-	ut_assert(IS_ERR_VALUE(rate));
+	ut_asserteq(0, sandbox_clk_test_round_rate(dev_test,
+						   SANDBOX_CLK_TEST_ID_SPI, 0));
+	ut_asserteq(0, sandbox_clk_test_round_rate(dev_test,
+						   SANDBOX_CLK_TEST_ID_I2C, 0));
 
 	ut_asserteq(10000, sandbox_clk_test_get_rate(dev_test,
 						     SANDBOX_CLK_TEST_ID_SPI));
