@@ -52,6 +52,6 @@ void __assert_fail(const char *assertion, const char *file, unsigned int line,
 		   const char *function)
 {
 	/* This will not return */
-	panic("%s:%u: %s: Assertion `%s' failed.", file, line, function,
+	panic("%s:%u: %s: Assertion `%s' failed.\n", file, line, function,
 	      assertion);
 }
