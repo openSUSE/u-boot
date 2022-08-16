@@ -60,6 +60,7 @@ testfn=noncontig.img
 mnttestfn=${mnt}/${testfn}
 crcaddr=0
 loadaddr=1000
+[ -n "$SUDO" ] || SUDO=sudo
 
 for prereq in fallocate mkfs.fat dd crc32; do
     if [ ! -x "`which $prereq`" ]; then
@@ -87,7 +88,7 @@ if [ ! -f ${img} ]; then
         exit $?
     fi
 
-    sudo mount -o loop,uid=$(id -u) ${img} ${mnt}
+    $SUDO mount -o loop,uid=$(id -u) ${img} ${mnt}
     if [ $? -ne 0 ]; then
         echo Could not mount test filesystem
         exit $?
@@ -106,20 +107,20 @@ if [ ! -f ${img} ]; then
     # sector size (ignoring sizes that are multiples of both).
     dd if=${fill} of=${mnttestfn} bs=511 >/dev/null 2>&1
 
-    sudo umount ${mnt}
+    $SUDO umount ${mnt}
     if [ $? -ne 0 ]; then
         echo Could not unmount test filesystem
         exit $?
     fi
 fi
 
-sudo mount -o ro,loop,uid=$(id -u) ${img} ${mnt}
+$SUDO mount -o ro,loop,uid=$(id -u) ${img} ${mnt}
 if [ $? -ne 0 ]; then
     echo Could not mount test filesystem
     exit $?
 fi
 crc=0x`crc32 ${mnttestfn}`
-sudo umount ${mnt}
+$SUDO umount ${mnt}
 if [ $? -ne 0 ]; then
     echo Could not unmount test filesystem
     exit $?

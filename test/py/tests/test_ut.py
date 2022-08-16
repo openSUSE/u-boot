@@ -8,6 +8,8 @@ import pytest
 
 import u_boot_utils
 
+sudo = os.environ.get('SUDO', 'sudo')
+
 def mkdir_cond(dirname):
     """Create a directory if it doesn't already exist
 
@@ -25,7 +27,7 @@ def setup_bootflow_image(u_boot_console):
     mkdir_cond(mnt)
 
     u_boot_utils.run_and_log(cons, 'qemu-img create %s 20M' % fname)
-    u_boot_utils.run_and_log(cons, 'sudo sfdisk %s' % fname,
+    u_boot_utils.run_and_log(cons, sudo + ' sfdisk %s' % fname,
                              stdin=b'type=c')
 
     loop = None
@@ -33,12 +35,12 @@ def setup_bootflow_image(u_boot_console):
     complete = False
     try:
         out = u_boot_utils.run_and_log(cons,
-                                       'sudo losetup --show -f -P %s' % fname)
+                                       sudo + ' losetup --show -f -P %s' % fname)
         loop = out.strip()
         fatpart = '%sp1' % loop
-        u_boot_utils.run_and_log(cons, 'sudo mkfs.vfat %s' % fatpart)
+        u_boot_utils.run_and_log(cons, sudo + ' mkfs.vfat %s' % fatpart)
         u_boot_utils.run_and_log(
-            cons, 'sudo mount -o loop %s %s -o uid=%d,gid=%d' %
+            cons, sudo + ' mount -o loop %s %s -o uid=%d,gid=%d' %
             (fatpart, mnt, os.getuid(), os.getgid()))
         mounted = True
 
@@ -84,9 +86,9 @@ label Fedora-Workstation-armhfp-31-1.9 (5.3.7-301.fc31.armv7hl)
               str(exc))
     finally:
         if mounted:
-            u_boot_utils.run_and_log(cons, 'sudo umount %s' % mnt)
+            u_boot_utils.run_and_log(cons, sudo + ' umount %s' % mnt)
         if loop:
-            u_boot_utils.run_and_log(cons, 'sudo losetup -d %s' % loop)
+            u_boot_utils.run_and_log(cons, sudo + ' losetup -d %s' % loop)
 
     if not complete:
         # Use a prepared image since we cannot create one

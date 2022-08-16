@@ -10,6 +10,8 @@ from subprocess import call, check_call, check_output, CalledProcessError
 from fstest_defs import *
 import u_boot_utils as util
 
+sudo = os.environ.get('SUDO', 'sudo')
+
 supported_fs_basic = ['fat16', 'fat32', 'ext4']
 supported_fs_ext = ['fat16', 'fat32']
 supported_fs_mkdir = ['fat16', 'fat32']
@@ -222,11 +224,11 @@ def mount_fs(fs_type, device, mount_point):
     if re.match('fat', fs_type):
         mount_opt += ',umask=0000'
 
-    check_call('sudo mount -o %s %s %s'
+    check_call(sudo + ' mount -o %s %s %s'
         % (mount_opt, device, mount_point), shell=True)
 
     # may not be effective for some file systems
-    check_call('sudo chmod a+rw %s' % mount_point, shell=True)
+    check_call(sudo + ' chmod a+rw %s' % mount_point, shell=True)
 
 def umount_fs(mount_point):
     """Unmount a volume.
@@ -251,7 +253,7 @@ def umount_fs(mount_point):
             pass
 
     else:
-        call('sudo umount %s' % mount_point, shell=True)
+        call(sudo + ' umount %s' % mount_point, shell=True)
 
 #
 # Fixture for basic fs test

@@ -55,6 +55,8 @@ OUT="${OUT_DIR}/fs-test"
 MB1="${MOUNT_DIR}/${SMALL_FILE}"
 GB2p5="${MOUNT_DIR}/${BIG_FILE}"
 
+[ -n "$SUDO" ] || SUDO=sudo
+
 # ************************
 # * Functions start here *
 # ************************
@@ -351,34 +353,34 @@ EOF
 function create_files() {
 	# Mount the image so we can populate it.
 	mkdir -p "$MOUNT_DIR"
-	sudo mount -o loop,rw "$1" "$MOUNT_DIR"
+	$SUDO mount -o loop,rw "$1" "$MOUNT_DIR"
 
 	# Create a subdirectory.
-	sudo mkdir -p "$MOUNT_DIR/SUBDIR"
+	$SUDO mkdir -p "$MOUNT_DIR/SUBDIR"
 
 	# Create big file in this image.
 	# Note that we work only on the start 1MB, couple MBs in the 2GB range
 	# and the last 1 MB of the huge 2.5GB file.
 	# So, just put random values only in those areas.
 	if [ ! -f "${GB2p5}" ]; then
-		sudo dd if=/dev/urandom of="${GB2p5}" bs=1M count=1 \
+		$SUDO dd if=/dev/urandom of="${GB2p5}" bs=1M count=1 \
 			&> /dev/null
-		sudo dd if=/dev/urandom of="${GB2p5}" bs=1M count=2 seek=2047 \
+		$SUDO dd if=/dev/urandom of="${GB2p5}" bs=1M count=2 seek=2047 \
 			&> /dev/null
-		sudo dd if=/dev/urandom of="${GB2p5}" bs=1M count=1 seek=2499 \
+		$SUDO dd if=/dev/urandom of="${GB2p5}" bs=1M count=1 seek=2499 \
 			&> /dev/null
 	fi
 
 	# Create a small file in this image.
 	if [ ! -f "${MB1}" ]; then
-		sudo dd if=/dev/urandom of="${MB1}" bs=1M count=1 \
+		$SUDO dd if=/dev/urandom of="${MB1}" bs=1M count=1 \
 			&> /dev/null
 	fi
 
 	# Delete the small file copies which possibly are written as part of a
 	# previous test.
-	sudo rm -f "${MB1}.w"
-	sudo rm -f "${MB1}.w2"
+	$SUDO rm -f "${MB1}.w"
+	$SUDO rm -f "${MB1}.w2"
 
 	# Generate the md5sums of reads that we will test against small file
 	dd if="${MB1}" bs=1M skip=0 count=1 2> /dev/null | md5sum > "$2"
@@ -405,7 +407,7 @@ function create_files() {
 		2> /dev/null | md5sum >> "$2"
 
 	sync
-	sudo umount "$MOUNT_DIR"
+	$SUDO umount "$MOUNT_DIR"
 	rmdir "$MOUNT_DIR"
 }
 
@@ -597,13 +599,13 @@ for fs in ext4 fat16 fat32; do
 		uid=""
 		;;
 	esac
-	sudo mount -o loop,rw,$uid "$IMAGE" "$MOUNT_DIR"
-	sudo chmod 777 "$MOUNT_DIR"
+	$SUDO mount -o loop,rw,$uid "$IMAGE" "$MOUNT_DIR"
+	$SUDO chmod 777 "$MOUNT_DIR"
 
 	OUT_FILE="${OUT}.sb.${fs}.out"
 	test_image $IMAGE $fs $SMALL_FILE $BIG_FILE sb `pwd`/$MOUNT_DIR \
 		> ${OUT_FILE} 2>&1
-	sudo umount "$MOUNT_DIR"
+	$SUDO umount "$MOUNT_DIR"
 	rmdir "$MOUNT_DIR"
 
 	check_results $OUT_FILE $MD5_FILE_FS $SMALL_FILE $BIG_FILE
