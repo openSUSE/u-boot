@@ -15,6 +15,8 @@ from patman import command
 
 from io import StringIO
 
+coverage = os.environ.get('COVERAGE', 'python3-coverage')
+
 use_concurrent = True
 try:
     from concurrencytest.concurrencytest import ConcurrentTestSuite
@@ -57,11 +59,11 @@ def run_test_coverage(prog, filter_fname, exclude_list, build_dir, required=None
     prefix = ''
     if build_dir:
         prefix = 'PYTHONPATH=$PYTHONPATH:%s/sandbox_spl/tools ' % build_dir
-    cmd = ('%spython3-coverage run '
-           '--omit "%s" %s %s %s -P1' % (prefix, ','.join(glob_list),
+    cmd = ('%s run '
+           '--omit "%s" %s %s %s -P1' % (coverage, ','.join(glob_list),
                                          prog, extra_args or '', test_cmd))
     os.system(cmd)
-    stdout = command.output('python3-coverage', 'report')
+    stdout = command.output(coverage, 'report')
     lines = stdout.splitlines()
     if required:
         # Convert '/path/to/name.py' just the module name 'name'
@@ -75,14 +77,14 @@ def run_test_coverage(prog, filter_fname, exclude_list, build_dir, required=None
             print(stdout)
             ok = False
 
-    coverage = lines[-1].split(' ')[-1]
+    coverage_out = lines[-1].split(' ')[-1]
     ok = True
-    print(coverage)
-    if coverage != '100%':
+    print(coverage_out)
+    if coverage_out != '100%':
         print(stdout)
-        print("Type 'python3-coverage html' to get a report in "
-              'htmlcov/index.html')
-        print('Coverage error: %s, but should be 100%%' % coverage)
+        print("Type '%s html' to get a report in "
+              'htmlcov/index.html' % (coverage))
+        print('Coverage error: %s, but should be 100%%' % coverage_out)
         ok = False
     if not ok:
         raise ValueError('Test coverage failure')
