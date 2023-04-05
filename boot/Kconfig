@@ -885,6 +885,7 @@ config DISTRO_DEFAULTS
 	select CMD_SYSBOOT
 	select HUSH_PARSER
 	select SYS_LONGHELP
+	imply CMD_BTRFS if !RISCV && !MIPS
 	help
 	  Select this to enable various options and commands which are suitable
 	  for building u-boot for booting general purpose Linux distributions.
