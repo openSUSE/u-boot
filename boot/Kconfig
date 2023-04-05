@@ -1185,7 +1185,7 @@ config DISTRO_DEFAULTS
 	select HUSH_PARSER
 	select SYS_LONGHELP
 	select LEGACY_IMAGE_FORMAT
-	imply CMD_BTRFS if !RISCV && !MIPS
+	imply CMD_BTRFS if !MIPS
 	help
 	  Note: These scripts have been replaced by Standard Boot. Do not use
 	  them on new boards. See 'Migrating from distro_boot' at
