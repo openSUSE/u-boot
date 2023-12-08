@@ -19,7 +19,7 @@
 #ifdef CONFIG_ARM64
 #include <asm/armv8/mmu.h>
 
-#define MEM_MAP_MAX_ENTRIES (4)
+#define MEM_MAP_MAX_ENTRIES (5)
 
 static struct mm_region bcm283x_mem_map[MEM_MAP_MAX_ENTRIES] = {
 	{
@@ -68,6 +68,41 @@ static struct mm_region bcm2711_mem_map[MEM_MAP_MAX_ENTRIES] = {
 	}
 };
 
+static struct mm_region bcm2712_mem_map[MEM_MAP_MAX_ENTRIES] = {
+	{
+		.virt = 0x00000000UL,
+		.phys = 0x00000000UL,
+		.size = 0x3f800000UL,
+		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
+			 PTE_BLOCK_INNER_SHARE
+	}, {
+		.virt = 0x3f800000UL,
+		.phys = 0x3f800000UL,
+		.size = 0x00800000UL,
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
+			 PTE_BLOCK_NON_SHARE |
+			 PTE_BLOCK_PXN | PTE_BLOCK_UXN
+	}, {
+		/* Beginning of AXI bus where uSD controller lives */
+		.virt = 0x1000000000UL,
+		.phys = 0x1000000000UL,
+		.size = 0x0002000000UL,
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
+			 PTE_BLOCK_NON_SHARE |
+			 PTE_BLOCK_PXN | PTE_BLOCK_UXN
+	}, {
+		.virt = 0x107c000000UL,
+		.phys = 0x107c000000UL,
+		.size = 0x0004000000UL,
+		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
+			 PTE_BLOCK_NON_SHARE |
+			 PTE_BLOCK_PXN | PTE_BLOCK_UXN
+	}, {
+		/* List terminator */
+		0,
+	}
+};
+
 struct mm_region *mem_map = bcm283x_mem_map;
 
 /*
@@ -78,6 +113,7 @@ static const struct udevice_id board_ids[] = {
 	{ .compatible = "brcm,bcm2837", .data = (ulong)&bcm283x_mem_map},
 	{ .compatible = "brcm,bcm2838", .data = (ulong)&bcm2711_mem_map},
 	{ .compatible = "brcm,bcm2711", .data = (ulong)&bcm2711_mem_map},
+	{ .compatible = "brcm,bcm2712", .data = (ulong)&bcm2712_mem_map},
 	{ },
 };
 
