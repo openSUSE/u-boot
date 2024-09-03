@@ -40,7 +40,7 @@
 &qspi {
 	bootph-pre-ram;
 
-	nor-flash@0 {
+	nor_flash@0 {
 		bootph-pre-ram;
 	};
 };
