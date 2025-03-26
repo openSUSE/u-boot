@@ -437,6 +437,7 @@ config BOOT_DEFAULTS_CMDS
 	select CMD_BOOTI if ARM64 && LMB
 	select CMD_BOOTZ if ARM && !ARM64 && LMB
 	imply CMD_MII if CMD_NET && NET
+	imply CMD_BTRFS
 
 config BOOT_DEFAULTS
 	bool  # Common defaults for standard boot and distroboot
